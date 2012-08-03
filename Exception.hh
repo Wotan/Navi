@@ -12,17 +12,22 @@ namespace navi {
     static int const buffer_size = 512;
   public:
     Exception(std::string const& str) : _str(str) {}
-    Exception(char const* str) : _str(str) {}
     Exception(char const* str, ...) : _str() {
-      va_list ap; char buffer[buffer_size];
+      va_list ap;
       va_start(ap, str);
-      vsnprintf(buffer, buffer_size, str, ap);
+      setStringVaArgs(str, ap);
       va_end(ap);
+    }
+    void setStringVaArgs(char const* str, va_list ap) {
+      char buffer[buffer_size];
+      vsnprintf(buffer, buffer_size, str, ap);
       _str.append(buffer);
     }
     Exception& operator=(exception const& o);
     virtual ~Exception() throw() {}
     virtual const char* what() const throw() { return _str.c_str(); }
+  protected:
+    Exception() : _str("") {}
   private:
     std::string _str;
   };
@@ -31,7 +36,13 @@ namespace navi {
   class NAME : public navi::Exception {				\
   public:							\
   NAME(std::string const& str) : navi::Exception(str) {}	\
-  }
+  NAME(char const* str, ...) : navi::Exception() {		\
+    va_list ap;							\
+    va_start(ap, str);						\
+    setStringVaArgs(str, ap);					\
+    va_end(ap);							\
+  }								\
+}
 
 } // !navi
 
