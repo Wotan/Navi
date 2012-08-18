@@ -14,39 +14,75 @@ namespace navi {
     }
   };
 
+  template <class T>
+  struct SingleThreaded
+  {
+    class Lock {
+    public:
+      Lock() {}
+      ~Lock() {}
+    };
+    typedef T VolatileType;
+  };
+
   template <
-    class T,
+    typename T,
+    template <class> class threadingPolicy = SingleThreaded,
     template <class> class creationPolicy = CreateWithNew,
     template <class> class lifetimePolicy = DestroyAtExit
     >
   class SingletonHolder {
   public:
-    static T& instance() {
-      if (!_instance) {
-	_instance = creationPolicy<T>::create();
-	lifetimePolicy<T>::ScheduleDestruction(&destroy);
-      }
-      return *_instance;
-    }
+    static T& instance();
 
   private:
+    static void createInstance();
     static void destroy() {
       creationPolicy<T>::destroy(_instance);
     }
-
-    SingletonHolder() {}
-    ~SingletonHolder() {}
-
+    SingletonHolder();
   private:
-    static T* _instance;
+    typedef typename threadingPolicy<T*>::VolatileType InstanceType;
+    static InstanceType _instance;
   };
 
 template <
-  class T,
+  typename T,
+  template <class> class threadingPolicy,
   template <class> class creationPolicy,
   template <class> class lifetimePolicy
   >
-T* SingletonHolder<T, creationPolicy, lifetimePolicy>::_instance = 0;
+inline T& SingletonHolder<T, threadingPolicy, creationPolicy, lifetimePolicy>::instance()
+{
+  if (!_instance)
+    createInstance();
+  return *_instance;
+}
+
+template <
+  typename T,
+  template <class> class threadingPolicy,
+  template <class> class creationPolicy,
+  template <class> class lifetimePolicy
+  >
+void SingletonHolder<T, threadingPolicy, creationPolicy, lifetimePolicy>::createInstance()
+{
+  typename threadingPolicy<SingletonHolder>::Lock guard;
+  (void)guard;
+  if (!_instance) {
+    _instance = creationPolicy<T>::create();
+    lifetimePolicy<T>::ScheduleDestruction(&destroy);
+  }
+}
+
+template <
+  class A,
+  template <class> class B,
+  template <class> class C,
+  template <class> class D
+  >
+typename SingletonHolder<A, B, C, D>::InstanceType
+SingletonHolder<A, B, C, D>::_instance = 0;
 
 } // !navi
 
