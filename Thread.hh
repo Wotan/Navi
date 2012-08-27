@@ -37,11 +37,35 @@ public:
     Lock();
     Lock(const Lock&);
     Lock& operator=(const Lock&);
-    const ObjectLevelLockable& _host;
+    ObjectLevelLockable const& _host;
   };
+
+  class Unlock {
+  public:
+    explicit Unlock(ObjectLevelLockable const* host)
+      : _host(*host)
+    {
+      _host._mutex.unlock();
+    }
+    explicit Unlock(ObjectLevelLockable const& host)
+      : _host(host)
+    {
+      _host._mutex.unlock();
+    }
+    ~Unlock() {
+      _host._mutex.lock();
+    }
+  private:
+    Unlock();
+    Unlock(const Unlock&);
+    Unlock& operator=(const Unlock&);
+    ObjectLevelLockable const& _host;
+  };
+  void lock() { _mutex.lock(); }
+  void unlock() { _mutex.unlock(); }
   typedef volatile T VolatileType;
 private:
-  boost::mutex _mutex;
+  mutable boost::mutex _mutex;
 };
 
 template <class T>
@@ -60,6 +84,22 @@ public:
     Lock(const Lock&);
     Lock& operator=(const Lock&);
   };
+
+  class Unlock {
+  public:
+    Unlock()
+    {
+      _mutex.unlock();
+    }
+    ~Unlock() {
+      _mutex.lock();
+    }
+  private:
+    Unlock(const Unlock&);
+    Unlock& operator=(const Unlock&);
+  };
+  void lock() { _mutex.lock(); }
+  void unlock() { _mutex.unlock(); }
   typedef volatile T VolatileType;
 private:
   static boost::mutex _mutex;
