@@ -1,8 +1,14 @@
 #ifndef _TEMPLATEMACRO_H_
 # define _TEMPLATEMACRO_H_
 
-#undef NAVI_COMMA
-#define NAVI_COMMA ,
+# define NAVI_COMMA0
+# define NAVI_COMMA1 ,
+# define NAVI_COMMA2 ,
+# define NAVI_COMMA3 ,
+# define NAVI_COMMA4 ,
+# define NAVI_COMMA5 ,
+
+# define NAVI_COMMA_IFN0(n) NAVI_COMMA##n
 
 # define NAVI_TPL_FUN_CALL0
 # define NAVI_TPL_FUN_CALL1 a1

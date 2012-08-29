@@ -24,7 +24,7 @@ public:
       close();
   }
 
-  void open(std::string const& fileName)
+  virtual void open(std::string const& fileName)
   {
     if (_loaded)
       close();
@@ -36,15 +36,23 @@ public:
     }
   }
 
-# define PLUGIN_CALL_SYM_TPL(n)						\
-  template <class RET NAVI_COMMA NAVI_TPL_DEF(n)>			\
-  RET callSym(std::string const& name NAVI_COMMA NAVI_TPL_FUN_DEF(n)) {	\
-    if (!_loaded) throw Error("Plugin not loaded");			\
-    return getSym<RET NAVI_COMMA NAVI_TPL_TYPE_DEF(n)>			\
-      (name)(NAVI_TPL_FUN_CALL(n));					\
+  virtual void close()
+  {
+    if (_loaded) {
+      _impl.close();
+      _loaded = false;
+    }
+  }
+
+# define PLUGIN_CALL_SYM_TPL(n)						        \
+  template <class RET NAVI_COMMA_IFN0(n) NAVI_TPL_DEF(n)>		        \
+  RET callSym(std::string const& name NAVI_COMMA_IFN0(n) NAVI_TPL_FUN_DEF(n)) { \
+    if (!_loaded) throw Error("Plugin not loaded");				\
+    return getSym<RET NAVI_COMMA_IFN0(n) NAVI_TPL_TYPE_DEF(n)>			\
+      (name)(NAVI_TPL_FUN_CALL(n));						\
   }
 # define PLUGIN_GET_SYM(n)					\
-  template <class RET NAVI_COMMA NAVI_TPL_DEF(n)>		\
+  template <class RET NAVI_COMMA_IFN0(n) NAVI_TPL_DEF(n)>	\
   RET (*getSym(std::string const& name))(NAVI_TPL_FUN_DEF(n))	\
   {								\
     typedef RET (*Fun)(NAVI_TPL_TYPE_DEF(n));			\
@@ -52,29 +60,19 @@ public:
     if (!sym) throw Error(_impl.getError());			\
     return sym;							\
   }
-# define NAVI_COMMA
+
   PLUGIN_CALL_SYM_TPL(0)
-  PLUGIN_GET_SYM(0)
-# undef NAVI_COMMA
-# define NAVI_COMMA ,
   PLUGIN_CALL_SYM_TPL(1)
   PLUGIN_CALL_SYM_TPL(2)
   PLUGIN_CALL_SYM_TPL(3)
   PLUGIN_CALL_SYM_TPL(4)
   PLUGIN_CALL_SYM_TPL(5)
+  PLUGIN_GET_SYM(0)
   PLUGIN_GET_SYM(1)
   PLUGIN_GET_SYM(2)
   PLUGIN_GET_SYM(3)
   PLUGIN_GET_SYM(4)
   PLUGIN_GET_SYM(5)
-
-  void close()
-  {
-    if (_loaded) {
-      _impl.close();
-      _loaded = false;
-    }
-  }
 
 private:
   bool _loaded;

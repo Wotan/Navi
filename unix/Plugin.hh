@@ -3,11 +3,12 @@
 
 # include <dlfcn.h>
 
-namespace navi {
+namespace {
 
 class PluginImpl {
 public:
   PluginImpl() {}
+  virtual ~PluginImpl() { }
 
   bool open(std::string const& name)
   {
@@ -36,6 +37,6 @@ private:
   void* _handle;
 };
 
-} // !navi
+} // !unamed
 
 #endif /* !_PLUGINIMPL_H_ */
