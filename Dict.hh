@@ -40,7 +40,11 @@ public:
 
   template <typename T>
   T const get(std::string const& key) const {
+    try {
     return boost::any_cast<T>((*this)[key]);
+    } catch (std::exception&) {
+      throw Error("navi::Dict - key '%s': invalid cast", key.c_str());
+    }
   }
 
   bool exist(std::string const& key) {
