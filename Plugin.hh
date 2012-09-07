@@ -51,7 +51,7 @@ public:
     return getSym<RET NAVI_COMMA_IFN0(n) NAVI_TPL_TYPE_DEF(n)>			\
       (name)(NAVI_TPL_FUN_CALL(n));						\
   }
-# define PLUGIN_GET_SYM(n)					\
+# define PLUGIN_GET_SYM_TPL(n)					\
   template <class RET NAVI_COMMA_IFN0(n) NAVI_TPL_DEF(n)>	\
   RET (*getSym(std::string const& name))(NAVI_TPL_FUN_DEF(n))	\
   {								\
@@ -67,12 +67,12 @@ public:
   PLUGIN_CALL_SYM_TPL(3)
   PLUGIN_CALL_SYM_TPL(4)
   PLUGIN_CALL_SYM_TPL(5)
-  PLUGIN_GET_SYM(0)
-  PLUGIN_GET_SYM(1)
-  PLUGIN_GET_SYM(2)
-  PLUGIN_GET_SYM(3)
-  PLUGIN_GET_SYM(4)
-  PLUGIN_GET_SYM(5)
+  PLUGIN_GET_SYM_TPL(0)
+  PLUGIN_GET_SYM_TPL(1)
+  PLUGIN_GET_SYM_TPL(2)
+  PLUGIN_GET_SYM_TPL(3)
+  PLUGIN_GET_SYM_TPL(4)
+  PLUGIN_GET_SYM_TPL(5)
 
 private:
   bool _loaded;
