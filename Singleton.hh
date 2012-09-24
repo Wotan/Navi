@@ -36,10 +36,11 @@ namespace navi {
     static T& instance();
 
   private:
-    static void createInstance();
     static void destroy() {
       creationPolicy<T>::destroy(_instance);
+      _instance = 0;
     }
+    static void createInstance();
     SingletonHolder();
   private:
     typedef typename threadingPolicy<T*>::VolatileType InstanceType;
