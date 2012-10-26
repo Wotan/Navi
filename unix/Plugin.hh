@@ -12,7 +12,8 @@ public:
 
   bool open(std::string const& name)
   {
-    _handle = dlopen(name.c_str(), RTLD_NOW | RTLD_GLOBAL);
+    std::string realName = name + ".so";
+    _handle = dlopen(realName.c_str(), RTLD_NOW | RTLD_GLOBAL);
     if (_handle)
       dlerror();
     return _handle ? true : false;
