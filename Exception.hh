@@ -44,6 +44,8 @@ namespace navi {
   }								\
 }
 
+DEFINE_EXCEPTION(Error);
+
 } // !navi
 
 
