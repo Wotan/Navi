@@ -5,14 +5,13 @@
 # include "TemplateMacro.hh"
 
 # if defined(unix) || defined(__unix__) || defined(__unix)
-#  include "unix/Plugin.hh"
+#  include "unix/PluginImpl.hh" /* On dlopen plateform dont forget to link with libdl.so */
 # else
 #  error "Navi: plateform not supported"
 # endif
 
 namespace navi {
 
-/* On dlopen plateform dont forget to link with libdl.so */
 class Plugin {
 public:
   DEFINE_EXCEPTION(Error);
