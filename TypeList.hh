@@ -30,23 +30,25 @@ struct Size< TypeList<T, U> > {
 
 
 /////// Get type At /////////
-template<typename TL, unsigned int index> struct GetTypeAt;
+template<typename TL, unsigned int index, typename DTYPE = navi::NullType>
+struct GetTypeAt;
 
-template <unsigned int index> struct GetTypeAt<NullType, index>
+template <unsigned int index, typename DTYPE>
+struct GetTypeAt<NullType, index, DTYPE>
 {
-  typedef NullType type;
+  typedef DTYPE type;
 };
 
-template <typename T, typename U>
-struct GetTypeAt< TypeList<T, U>, 0 >
+template <typename T, typename U, typename DTYPE>
+struct GetTypeAt< TypeList<T, U>, 0, DTYPE>
 {
   typedef T type;
 };
 
-template <typename T, typename U, unsigned int index>
-struct GetTypeAt< TypeList<T, U>, index >
+template <typename T, typename U, unsigned int index, typename DTYPE>
+struct GetTypeAt< TypeList<T, U>, index, DTYPE>
 {
-  typedef typename GetTypeAt<U, index - 1>::type type;
+  typedef typename GetTypeAt<U, index - 1, DTYPE>::type type;
 };
 
 }

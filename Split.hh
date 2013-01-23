@@ -11,7 +11,7 @@ template <typename T>
 void split(std::string const& str, std::vector<T>& vect, char sep = ' ')
 {
   for (std::size_t i = 0; i < str.size(); ++i) {
-    for (;str[i] == sep && i < str.size(); ++i);
+    for (;str[i] == sep && i < str.size(); ++i) ;
     if (str[i]) {
       std::string pending;
       for (;str[i] != sep && i < str.size(); ++i)

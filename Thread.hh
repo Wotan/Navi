@@ -1,113 +1,119 @@
-#ifndef _THREADPOLICIES_H_
-# define _THREADPOLICIES_H_
+#ifndef _THREAD_H_
+# define _THREAD_H_
 
-# include <boost/thread.hpp>
+# include "Navi.hh"
+# include "Bind.hh"
+# include "Exception.hh"
+
+# include <iostream>
+
+# if defined(NAVI_UNIX_PLATEFORM) || defined(NAVI_MAC_PLATEFORM)
+#  include "unix/ThreadImpl.hh"
+# elif defined(NAVI_WIN_PLATEFORM)
+#  include "win/ThreadImpl.hh"
+# else
+#  error "Navi thread: plateform not supported"
+# endif
 
 namespace navi {
 
-template <class T>
-struct ObjectLevelLockable
-{
+class Thread {
+  DEFINE_EXCEPTION(Error);
+  typedef void (*CallbackType)(void*);
 public:
-  ObjectLevelLockable()
-    : _mutex() {}
-  ObjectLevelLockable(const ObjectLevelLockable&)
-    : _mutex() {}
-  ~ObjectLevelLockable() {}
+  virtual ~Thread() {
+    if (isJoinable())
+      join();
+  }
 
-  class Lock;
-  friend class Lock;
+  template <typename FUN>
+  Thread(FUN fun)
+  {
+    startThread(bind(fun));
+  }
 
-  class Lock {
-  public:
-    explicit Lock(ObjectLevelLockable const* host)
-      : _host(*host)
-    {
-      _host._mutex.lock();
-    }
-    explicit Lock(ObjectLevelLockable const& host)
-      : _host(host)
-    {
-      _host._mutex.lock();
-    }
-    ~Lock() {
-      _host._mutex.unlock();
-    }
-  private:
-    Lock();
-    Lock(const Lock&);
-    Lock& operator=(const Lock&);
-    ObjectLevelLockable const& _host;
-  };
+  template <typename FUN, typename A1>
+  Thread(FUN fun, A1 a1)
+  {
+    startThread(bind(fun, a1));
+  }
 
-  class Unlock {
-  public:
-    explicit Unlock(ObjectLevelLockable const* host)
-      : _host(*host)
-    {
-      _host._mutex.unlock();
-    }
-    explicit Unlock(ObjectLevelLockable const& host)
-      : _host(host)
-    {
-      _host._mutex.unlock();
-    }
-    ~Unlock() {
-      _host._mutex.lock();
-    }
-  private:
-    Unlock();
-    Unlock(const Unlock&);
-    Unlock& operator=(const Unlock&);
-    ObjectLevelLockable const& _host;
-  };
-  void lock() { _mutex.lock(); }
-  void unlock() { _mutex.unlock(); }
-  typedef volatile T VolatileType;
+  template <typename FUN, typename A1, typename A2>
+  Thread(FUN fun, A1 a1, A2 a2)
+  {
+    startThread(bind(fun, a1, a2));
+  }
+
+  template <typename FUN, typename A1, typename A2, typename A3>
+  Thread(FUN fun, A1 a1, A2 a2, A3 a3)
+  {
+    startThread(bind(fun, a1, a2, a3));
+  }
+
+  template <typename FUN, typename A1, typename A2, typename A3, typename A4>
+  Thread(FUN fun, A1 a1, A2 a2, A3 a3, A4 a4)
+  {
+    startThread(bind(fun, a1, a2, a3, a4));
+  }
+
+  template <typename FUN, typename A1, typename A2, typename A3, typename A4, typename A5>
+  Thread(FUN fun, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5)
+  {
+    startThread(bind(fun, a1, a2, a3, a4, a5));
+  }
+
+  template <typename FUN, typename A1, typename A2, typename A3, typename A4, typename A5, typename A6>
+  Thread(FUN fun, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6)
+  {
+    startThread(bind(fun, a1, a2, a3, a4, a5, a6));
+  }
+
+  bool isJoinable() const {
+    return _started;
+  }
+
+  void join()
+  {
+    if (!_impl.join())
+      threadError();
+    _started = false;
+  }
+
+  void cancel()
+  {
+    if (!_impl.cancel())
+      threadError();
+    _started = false;
+  }
+
 private:
-  mutable boost::mutex _mutex;
-};
+  template <typename BinderType>
+  void startThread(BinderType binder)
+  {
+    _started = true;
+    BinderType* b = new BinderType(binder);
+    if (!_impl.create(&ThreadCallback<BinderType>, b))
+      threadError();
+  }
 
-template <class T>
-class ClassLevelLockable {
-public:
-  class Lock {
-  public:
-    Lock()
-    {
-      _mutex.lock();
-    }
-    ~Lock() {
-      _mutex.unlock();
-    }
-  private:
-    Lock(const Lock&);
-    Lock& operator=(const Lock&);
-  };
+  void threadError()
+  {
+    throw Error("Thread error: %s", _impl.getError());
+  }
 
-  class Unlock {
-  public:
-    Unlock()
-    {
-      _mutex.unlock();
-    }
-    ~Unlock() {
-      _mutex.lock();
-    }
-  private:
-    Unlock(const Unlock&);
-    Unlock& operator=(const Unlock&);
-  };
-  void lock() { _mutex.lock(); }
-  void unlock() { _mutex.unlock(); }
-  typedef volatile T VolatileType;
+  template <typename BinderType>
+  static void ThreadCallback(void *arg)
+  {
+    BinderType* binder = static_cast<BinderType*>(arg);
+    (*binder)();
+    delete binder;
+  }
+
 private:
-  static boost::mutex _mutex;
+  priv::ThreadImpl _impl;
+  bool _started;
 };
-
-template <typename T>
-boost::mutex ClassLevelLockable<T>::_mutex;
 
 } // !navi
 
-#endif /* !_THREADPOLICIES_H_ */
+#endif /* !_THREAD_H_ */

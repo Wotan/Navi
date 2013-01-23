@@ -3,8 +3,6 @@
 
 # include <dlfcn.h>
 
-namespace {
-
 class PluginImpl {
 public:
   PluginImpl() {}
@@ -12,7 +10,11 @@ public:
 
   bool open(std::string const& name)
   {
+#if defined(MAC_PLATEFORM)
+    std::string realName = name + ".dylib";
+#elif defined(UNIX_PLATEFORM)
     std::string realName = name + ".so";
+#endif
     _handle = dlopen(realName.c_str(), RTLD_NOW | RTLD_GLOBAL);
     if (_handle)
       dlerror();
@@ -37,7 +39,5 @@ public:
 private:
   void* _handle;
 };
-
-} // !unamed
 
 #endif /* !_PLUGINIMPL_H_ */
