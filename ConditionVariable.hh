@@ -1,9 +1,9 @@
 #ifndef _CONDITIONVARIABLE_H_
 #define _CONDITIONVARIABLE_H_
 
-# if defined(NAVI_UNIX_PLATEFORM) || defined(NAVI_MAC_PLATEFORM)
+# if defined(NAVI_UNIX_PLATFORM) || defined(NAVI_MAC_PLATFORM)
 #  include "unix/ConditionVariableImpl.hh"
-# elif defined(NAVI_WIN_PLATEFORM)
+# elif defined(NAVI_WIN_PLATFORM)
 # include "win/ConditionVariableImpl.hh"
 # else
 #  error "Navi mutex: plateform not supported"

@@ -10,9 +10,9 @@ public:
 
   bool open(std::string const& name)
   {
-#if defined(MAC_PLATEFORM)
+#if defined(MAC_PLATFORM)
     std::string realName = name + ".dylib";
-#elif defined(UNIX_PLATEFORM)
+#elif defined(UNIX_PLATFORM)
     std::string realName = name + ".so";
 #endif
     _handle = dlopen(realName.c_str(), RTLD_NOW | RTLD_GLOBAL);

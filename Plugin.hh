@@ -4,9 +4,9 @@
 # include "Exception.hh"
 # include "TemplateMacro.hh"
 
-# if defined(NAVI_UNIX_PLATEFORM) || defined(NAVI_MAC_PLATEFORM)
+# if defined(NAVI_UNIX_PLATFORM) || defined(NAVI_MAC_PLATFORM)
 #  include "unix/PluginImpl.hh" /* On dlopen plateform dont forget to link with libdl.so */
-# elif defined(NAVI_WIN_PLATEFORM)
+# elif defined(NAVI_WIN_PLATFORM)
 # include "windows/PluginImpl.hh"
 # else
 #  error "Navi thread: plateform not supported"

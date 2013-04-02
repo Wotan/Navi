@@ -22,7 +22,7 @@ public:
   }
   void setStringVaArgs(char const* str, va_list ap) {
     char buffer[buffer_size];
-#if defined(NAVI_WIN_PLATEFORM)
+#if defined(NAVI_WIN_PLATFORM)
     vsnprintf_s(buffer, buffer_size, str, ap);
 #else
     vsnprintf(buffer, buffer_size, str, ap);
